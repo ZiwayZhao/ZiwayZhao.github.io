@@ -6,7 +6,7 @@ subtitle: B.Sc. student, <a href='https://www.tum.de/en/'>Technical University o
 
 profile:
   align: right
-  image: # add your headshot as assets/img/prof_pic.jpg, then put the filename here
+  image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
     <p>Munich, Germany</p>
