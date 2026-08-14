@@ -10,9 +10,7 @@ contact_note: >
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
   Ziwei Zhao — B.Sc. student at the Technical University of Munich, working on Trustworthy AI, Multimodal &amp; Agentic Systems, and AI for Science.
 footer_text: >
-  Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme.
-  Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
-  Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
+  &copy; Ziwei Zhao. Built with <a href="https://github.com/alshedivat/al-folio">al-folio</a> on <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
 keywords: Ziwei Zhao, trustworthy AI, calibration, long-tailed learning, federated learning, LLM safety, agentic AI, causal, PhD
 lang: en # the language of your site (for example: en, fr, cn, ru, etc.)
 icon: favicon.svg # jasmine mark (assets/img/favicon.svg)
