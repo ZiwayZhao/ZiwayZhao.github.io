@@ -206,3 +206,12 @@ html[data-theme-setting="light"] {
 #light-toggle:hover .fa-half-sun-moon::after {
   color: var(--global-theme-color);
 }
+
+/* --- About page: larger, top-aligned profile photo (wide screens only) --- */
+@media (min-width: 992px) {
+  .profile.float-right {
+    width: 36% !important;
+    margin-top: -6.5rem !important;
+    margin-left: 1.5rem !important;
+  }
+}
