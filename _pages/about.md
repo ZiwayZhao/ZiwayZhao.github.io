@@ -9,6 +9,7 @@ profile:
   image: prof_pic.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
+    <p>Ziway · <em>live my own way</em></p>
     <p>Munich, Germany</p>
     <p>ziwei.zhao@tum.de</p>
 
@@ -25,8 +26,6 @@ latest_posts:
   scrollable: true # adds a vertical scroll bar if there are more than 3 new posts items
   limit: 3 # leave blank to include all the blog posts
 ---
-
-I go by **Ziway** — a name I gave myself, short for *live my own way*.
 
 I am a B.Sc. student in Information Engineering at the [Technical University of Munich](https://www.tum.de/en/). In 2025 I was a visiting student at the [Gaoling School of Artificial Intelligence, Renmin University of China](http://ai.ruc.edu.cn/english/index.htm), where I worked closely with Prof. [Yanbiao Ma](https://scholar.google.com/citations?user=j05wwXcAAAAJ&hl=en) and Prof. [Wenxuan Wang](https://jarviswang94.github.io/).
 
