@@ -26,6 +26,8 @@ latest_posts:
   limit: 3 # leave blank to include all the blog posts
 ---
 
+I go by **Ziway** — a name I gave myself, short for *live my own way*.
+
 I am a B.Sc. student in Information Engineering at the [Technical University of Munich](https://www.tum.de/en/). In 2025 I was a visiting student at the [Gaoling School of Artificial Intelligence, Renmin University of China](http://ai.ruc.edu.cn/english/index.htm), where I worked closely with Prof. [Yanbiao Ma](https://scholar.google.com/citations?user=j05wwXcAAAAJ&hl=en) and Prof. [Wenxuan Wang](https://jarviswang94.github.io/).
 
 My research goal is to make machine-learning models **reliable under imperfect data and distribution shift** — to measure where they fail, give their predictions statistically valid guarantees, and carry those guarantees into the systems built on top of them. Concretely, I work on **fairness and calibration** in long-tailed and federated learning, **safety evaluation** of LLMs and **agentic systems**, and I am increasingly drawn to **causal representation learning** and **post-training** (RLHF/alignment) as the next step. Recurring thread: diagnose the failure, guarantee the fix, and make it survive deployment.
