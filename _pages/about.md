@@ -2,7 +2,7 @@
 layout: about
 title: about
 permalink: /
-subtitle: B.Sc. student, <a href='https://www.tum.de/en/'>Technical University of Munich</a> · Former Visiting Student, <a href='http://ai.ruc.edu.cn/english/index.htm'>RUC GSAI</a>
+subtitle: B.Sc. student, <a href='https://www.tum.de/en/'>Technical University of Munich</a>
 
 profile:
   align: right
