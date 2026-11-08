@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1250" height="740" viewBox="0 0 1250 740" role="img" aria-labelledby="title desc">
+  <title id="title">每条正射线选择固定长度的代表</title>
+  <desc id="desc">从同一原点出发的不同正射线分别与半径 R 的圆相交，绿色交点是各射线的代表。蓝色射线上的 w/2、w、2w 方向相同，长度不同，共用代表 Rw/‖w‖。不同射线代表不同方向，不要求损失相同。</desc>
+  <defs>
+    <marker id="ray" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#a0afc0"/></marker>
+    <marker id="blue" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#2864b4"/></marker>
+    <style>
+      text{font-family:'PingFang SC','Arial',sans-serif;fill:#243346;}
+      .math{font-family:'Times New Roman','STIX Two Math',serif;font-size:36px;font-style:italic;}
+      .label{font-size:28px;}
+    </style>
+  </defs>
+  <rect width="1250" height="740" fill="#fff"/>
+  <circle cx="350" cy="400" r="230" fill="none" stroke="#a9b8c8" stroke-width="2"/>
+  <line x1="350" y1="400" x2="535" y2="79.57" stroke="#a0afc0" stroke-width="2" marker-end="url(#ray)"/>
+  <line x1="350" y1="400" x2="64.21" y2="235" stroke="#a0afc0" stroke-width="2" marker-end="url(#ray)"/>
+  <line x1="350" y1="400" x2="137.88" y2="652.8" stroke="#a0afc0" stroke-width="2" marker-end="url(#ray)"/>
+  <line x1="350" y1="400" x2="1150" y2="400" stroke="#2864b4" stroke-width="3" marker-end="url(#blue)"/>
+  <line x1="350" y1="400" x2="350" y2="170" stroke="#a9b8c8" stroke-width="2" stroke-dasharray="6 6"/>
+  <circle cx="350" cy="400" r="5" fill="#243346"/>
+  <circle cx="530" cy="400" r="5" fill="#2864b4"/>
+  <circle cx="710" cy="400" r="5" fill="#2864b4"/>
+  <circle cx="1070" cy="400" r="5" fill="#2864b4"/>
+  <circle cx="580" cy="400" r="7" fill="#137b63"/>
+  <circle cx="465" cy="200.81" r="7" fill="#137b63"/>
+  <circle cx="150.81" cy="285" r="7" fill="#137b63"/>
+  <circle cx="202.16" cy="576.19" r="7" fill="#137b63"/>
+  <path d="M580,385 L600,350 L620,350" fill="none" stroke="#137b63" stroke-width="1.8"/>
+  <text x="365" y="455" class="label">原点</text>
+  <text x="485" y="455" class="math" style="fill:#2864b4">w/2</text>
+  <text x="694" y="455" class="math" style="fill:#2864b4">w</text>
+  <text x="1046" y="455" class="math" style="fill:#2864b4">2w</text>
+  <text x="310" y="280" class="math">R</text>
+  <text x="620" y="336" class="math" style="fill:#137b63">Rw/‖w‖</text>
+</svg>

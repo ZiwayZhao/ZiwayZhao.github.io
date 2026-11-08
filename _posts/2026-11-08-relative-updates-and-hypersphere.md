@@ -1,0 +1,526 @@
+---
+layout: "post"
+title: "相对更新之后：超球面约束额外改变了什么？"
+date: "2026-11-08 12:01:00 +0800"
+description: "用几何与轨迹推导，分清相对步幅控制和超球面约束各自改变了什么。"
+lang: "zh-CN"
+permalink: "/blog/2026/relative-updates-and-hypersphere/"
+tags: ["optimization", "elr", "hyperball"]
+categories: ["research-notes"]
+featured: true
+related_posts: false
+giscus_comments: false
+disqus_comments: false
+comment_key: "blog2"
+toc: {"beginning": true}
+_styles: ".blog-series { margin: 1.25rem 0 2rem; padding: 1rem 1.25rem; border: 1px solid var(--global-divider-color, #d8dde3); border-radius: .65rem; font-size: .95rem; }\n.blog-series a { margin-right: 1rem; }\n.blog-feedback { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--global-divider-color, #d8dde3); }\n.blog-feedback form { display: grid; gap: 1rem; margin-top: 1.5rem; }\n.blog-feedback label { display: grid; gap: .4rem; }\n.blog-feedback input, .blog-feedback textarea { width: 100%; border: 1px solid var(--global-divider-color, #a9b1bb); border-radius: .4rem; padding: .65rem .8rem; color: inherit; background: var(--global-bg-color, #fff); font: inherit; }\n.blog-feedback textarea { min-height: 10rem; resize: vertical; }\n.blog-feedback .consent { display: flex; align-items: flex-start; gap: .6rem; }\n.blog-feedback .consent input { width: 1.1rem; height: 1.1rem; flex-shrink: 0; margin-top: .2rem; }\n.blog-feedback button { justify-self: start; border: 1px solid var(--global-theme-color, #6653a6); border-radius: .4rem; padding: .65rem 1.2rem; background: var(--global-theme-color, #6653a6); color: #fff; font: inherit; cursor: pointer; }\n.blog-feedback input:focus-visible, .blog-feedback textarea:focus-visible, .blog-feedback button:focus-visible { outline: 2px solid var(--global-theme-color, #6653a6); outline-offset: 3px; }\n.blog-feedback .feedback-note { font-size: .9rem; color: var(--global-text-color-light, #697386); }\n.blog-selected-comment { margin: 1.25rem 0; padding: 1rem 1.25rem; border: 1px solid var(--global-divider-color, #d8dde3); border-radius: .5rem; }\n.blog-selected-comment .author-reply { margin-top: 1rem; padding-left: 1rem; border-left: 3px solid var(--global-theme-color, #6653a6); }\n.post-content img[src*=\"/blog/relative-updates/\"] { max-width: 100%; height: auto; background: #fff; border-radius: .4rem; }"
+---
+
+<nav class="blog-series" aria-label="相对更新系列">
+  <strong>相对更新系列</strong><br>
+  <a href="{{ '/blog/2026/invariance-to-relative-updates/' | relative_url }}">blog1 · 从缩放不变性要求推导优化器</a>
+  <a href="{{ '/blog/2026/relative-updates-and-hypersphere/' | relative_url }}">blog2 · 相对更新之后：超球面约束额外改变了什么？</a>
+</nav>
+
+<!-- article-source:start -->
+Recap：A 块存成十倍，B 块存成两倍，普通 SGD 就需要分别补偿两块的学习率。我们希望让更新规则自己处理这些倍数，于是提出参数缩放协变性，再加入损失缩放不变性，得到了一种相对更新：
+
+$$
+\Delta w=
+-\underbrace{\eta\lVert w\rVert}_{\text{更新长度}}
+\underbrace{\frac{g}{\lVert g\rVert}}_{\text{梯度的单位方向}}.
+$$
+
+下文把这条规则称为**相对更新**：先将当前梯度归一化，再把更新长度设为 η‖w‖。因此，η 直接控制的是“更新长度占当前权重长度的比例”。这里的“相对”，指的就是更新长度相对于权重长度，而不是一个固定的绝对距离。
+把它分别用于 A、B，两块共用一个 η，让两种参数表示下的训练轨迹保持对应。这里 η 直接等于更新长度占当前权重长度的比例，也就是blog1定义的有效学习率：
+
+$$
+\eta_{\mathrm{eff}}:=\frac{\lVert\Delta w\rVert}{\lVert w\rVert}=\eta.
+$$
+
+
+## 先区分：参数换表示与目标尺度不变
+
+原来的损失是：
+$$
+\ell(A,B)=A^2+B^2,\qquad \ell(3,4)=25.
+$$
+
+现在存成 Â=10A、B̂=2B，并在前向中分别除回去。我们得到的是另一个参数表达式：
+$$
+\hat\ell(\hat A,\hat B)=(\hat A/10)^2+(\hat B/2)^2.
+$$
+因此，对应参数处的损失相同：
+$$
+\hat\ell(30,8)=3^2+4^2=25=\ell(3,4).
+$$
+但如果保持原来的l 不变，只把参数从 3、4 改成 30、8，结果是：
+$$
+\ell(30,8)=30^2+8^2=964.
+$$
+区别在于，有没有同时修改前向，把放大的倍数除回去。
+blog1要求的是前一种操作下，优化器也能维持参数对应。用一个参数块表示，就是：
+
+$$
+\underbrace{\hat\ell(cw)=\ell(w)}_{\text{两种参数表示，在对应点比较}},
+\qquad \hat\ell(\hat w):=\ell(\hat w/c).
+$$
+
+而模型自身的**尺度不变性**，要求：
+$$
+\underbrace{\ell(cw)=\ell(w)}_{\text{同一个损失函数，直接缩放参数}}.
+$$
+
+前一个关系可以通过定义 ℓ̂ 来构造，后一个关系要看模型架构本身是否满足权重模长无关。我们的二次型例子就不满足后者，参数内**权重c的大小会影响损失。**
+所以，**上一篇满足要求的架构解决了参数表示改变时的训练对应问题，并没有证明权重模长可以舍弃**，从优化器的两个缩放要求出发，得到了相对更新规则。现在我们进一步问：相对更新对模型的学习过程意味着什么？
+
+一些研究从模型本身寻找理由：如果改变某个参数块的模长不改变模型（尺度不变性），那么，仅调整模长就不能改善loss；
+更新需要改变权重方向。这样，每步方向改变多少，以及是否可以固定模长，就成为值得讨论的问题。
+下文讨论这个条件成立时，相对更新长度与方向变化有什么联系；再讨论固定模长额外改变了什么，以及当模型不满足这个条件时，这些结论会受到什么影响。
+
+## 相对更新怎样改变权重方向？
+
+### 尺度不变时，为什么需要关注权重方向？
+
+训练时，优化器给出更新量 Δw，将当前权重 w 变成 w+Δw。先固定其他参数，只看这个块的更新，我们希望在同一个损失函数上得到：
+
+$$
+\ell\!\left(\underbrace{w+\Delta w}_{\text{更新后的权重}}\right)<\ell(w).
+$$
+
+如果当前目标满足 ℓ(cw)=ℓ(w)的尺度不变性，其中 c>0，那么，只要更新前后仍在同一条正射线上，损失就不会下降：
+
+$$
+\underbrace{w+\Delta w=cw}_{\text{只改变模长，单位方向不变}}
+\quad\Longrightarrow\quad
+\ell(w+\Delta w)=\ell(cw)=\ell(w).
+$$
+
+因此，在这个尺度不变条件下，若更新确实降低了损失，更新前后的权重单位方向就必须不同。对非零的新旧权重，可以写成：
+
+$$
+\ell(w+\Delta w)<\ell(w)
+\quad\Longrightarrow\quad
+\underbrace{\frac{w+\Delta w}{\lVert w+\Delta w\rVert}}_{\text{更新后的单位方向}}
+\ne
+\underbrace{\frac{w}{\lVert w\rVert}}_{\text{更新前的单位方向}}.
+$$
+
+这就给出了关注方向变化的理由。这里要分清：Δw 的方向决定从 w 的端点朝哪里移动；我们接下来要衡量的，是从原点看，w 与 w+Δw 的方向改变了多少。图中的 θ 表示后者。
+
+![更新量的方向与权重方向的变化]({{ '/assets/img/blog/relative-updates/blog2-update-and-direction.png' | relative_url }})
+
+### 相对更新长度相同，转角也可能不同
+
+在blog1构造的相对更新中，我们通过设定 η，直接控制每一步更新长度占当前权重长度的比例。接下来要问：设定这个比例，是否也能控制权重方向变化的大小？
+先固定当前权重 w。它从原点指向图中的圆心；更新量 Δw 从这个圆心出发，将端点移动到 w+Δw。
+如果只规定更新长度 ‖Δw‖，那么，在这个二维图中，所有可能的更新终点都落在以 w 的端点为圆心、以 ‖Δw‖ 为半径的圆上。当前权重长度相同、更新长度也相同，这些候选更新的 ELR 就相同。
+
+![等长更新对应不同权重转角]({{ '/assets/img/blog/relative-updates/blog2-equal-step-different-turn.png' | relative_url }})
+
+但从原点看，这个圆上的不同终点可以指向不同方向。图中，Δw₁ 沿原权重方向向内移动，且没有越过原点，新权重仍在原来的正射线上，转角为零；Δw₂ 向上移动相同长度，新权重指向圆的上端，转角大于零。**ELR 相同，只确定了这个圆相对于权重长度有多大，不能单独确定权重转过多少角度；还需要知道 Δw 指向圆上的哪里。** 我们接下来就单独计算这种方向变化的大小。
+
+为了把图中的方向变化写成一个数，先将 w 与 w+Δw 分别除以各自的长度。这样保留了新旧权重各自的方向，同时把它们的长度都变成 1。两个单位向量端点之间的距离，就是角更新幅度 AUS（Angular Update Size）：
+
+$$
+\mathrm{AUS}:=
+\left\lVert
+\underbrace{\frac{w+\Delta w}{\lVert w+\Delta w\rVert}}_{\text{更新后的单位方向}}
+-\underbrace{\frac{w}{\lVert w\rVert}}_{\text{更新前的单位方向}}
+\right\rVert.
+$$
+
+设新旧权重的夹角为 θ。归一化不改变这个夹角，因此，AUS 就是单位圆上对应的弦长：
+
+$$
+\mathrm{AUS}=2\sin(\theta/2).
+$$
+
+### 尺度不变性为什么使梯度与权重垂直？
+
+现在可以把问题具体化：我们设定的 ELR，怎样决定 θ，进而决定 AUS？前面的圆图说明，只有更新长度还不够，我们还需要知道 Δw 与 w 的方向关系。
+前面的圆图比较的是不同朝向的候选更新。现在回到blog1已经推导并验证过的具体规则，看看它会把更新终点放在哪里：
+
+$$
+\Delta w=-\eta\lVert w\rVert\frac{g}{\lVert g\rVert}.
+$$
+
+相对更新已经满足两个缩放要求；现在要分析的是，它让权重转过多少角度。
+式中 Δw 是 g 的负数倍，所以 Δw 与 g 在同一直线上、朝向相反。于是，要确定 Δw 相对于 w 的方向，只需先确定 g 相对于 w 的方向。接下来就从当前损失函数的性质，求出 g 与 w 的关系。
+
+**先假设当前目标对这个参数块具有尺度不变性。** 也就是固定其他参数，对任意非零参数 w 和任意 c>0，都有 ℓ(cw)=ℓ(w)。下面在损失可微的情况下，推导它对梯度方向的约束。
+在下面的左图中，w/2、w、2w 都位于同一条正射线上，损失相同。右图固定 w，只改变 c，ℓ(cw) 是一条水平线。c=1 对应当前参数 w，在这里沿射线放大一点或缩小一点，损失的变化率都是零。
+
+![尺度不变性、径向平坦与梯度垂直]({{ '/assets/img/blog/relative-updates/blog2-scale-invariance-gradient.png' | relative_url }})
+
+右图的水平线告诉我们：在当前点，沿射线移动时，损失的变化率为零。
+
+这里用到梯度的几何含义：**损失沿某个单位方向的一阶变化率，等于梯度 g 在这个方向上的投影，也就是它沿这个方向的分量。**
+投影为正，表示朝这个方向微移会使损失在一阶上增大；投影为负，表示一阶上减小；投影为零，表示这个方向没有一阶变化。
+因此，现在考察梯度沿射线的分量，是为了把已知的“沿射线损失变化率为零”写成梯度的几何关系。射线的单位方向是 w/‖w‖，于是：
+
+$$
+\underbrace{\left\langle g,\frac{w}{\lVert w\rVert}\right\rangle}_{\text{梯度沿射线的分量：也就是沿射线的损失变化率}}
+=0
+\quad\Longrightarrow\quad
+\langle w,g\rangle=0.
+$$
+
+也就是说，在参数块具有尺度不变性的前提下，梯度没有沿权重方向的分量，所以与权重垂直。如果 g 含有这个方向的分量，沿射线微移就会有非零的一阶损失变化，与刚才的水平线矛盾。在这个二维示意中，g 画在上方，是示意该处损失向上增大的情况；它也可以指向下方，但都不能带有沿射线的分量。
+
+代数角度的证明：
+回到当前讨论的尺度不变目标：对任意 c>0，都有 ℓ(cw)=ℓ(w)。这里先固定当前的 w，只让 c 改变，也就是沿 w 所在的正射线放大或缩小参数。
+为什么对 c 求导会等于零？因为尺度不变性说明，无论 c 怎样变化，ℓ(cw) 都等于同一个数 ℓ(w)。右边的 w 固定，ℓ(w) 不含 c，因此：
+
+$$
+\frac{d}{dc}\ell(cw)
+=\underbrace{\frac{d}{dc}\ell(w)}_{\text{对 }c\text{ 而言是常数的导数}}
+=0.
+$$
+
+再看左边的导数怎样计算。先只看两个分量，令 w=(w₁,w₂)，那么 cw=(cw₁,cw₂)。c 改变时，损失通过这两个参数受到影响：
+
+$$
+c\quad\longrightarrow\quad(cw_1,cw_2)
+\quad\longrightarrow\quad\ell(cw_1,cw_2).
+$$
+
+链式法则把每个分量的影响分别算出，再相加。先看第一个分量：w₁ 固定，cw₁ 对 c 的变化率是 w₁；损失对这个参数的变化率，则是梯度在第一个分量上的值 [∇ℓ(cw)]₁。两者相乘，就是通过第一个分量传递的变化率。第二个分量同理：
+
+$$
+\begin{aligned}
+\frac{d}{dc}\ell(cw)
+={}&\underbrace{[\nabla\ell(cw)]_1}_{\text{损失对第一个参数的变化率}}
+\underbrace{w_1}_{d(cw_1)/dc}\\[0.8em]
+&+\underbrace{[\nabla\ell(cw)]_2}_{\text{损失对第二个参数的变化率}}
+\underbrace{w_2}_{d(cw_2)/dc}.
+\end{aligned}
+$$
+
+这里的梯度在 cw 处计算，因为此时损失接收到的参数是 cw。所谓内积，就是两个向量的对应分量相乘再相加，因此：
+
+$$
+[\nabla\ell(cw)]_1w_1+[\nabla\ell(cw)]_2w_2
+=\langle w,\nabla\ell(cw)\rangle.
+$$
+
+有更多分量时，把每个分量的贡献都加上即可。用求和符号写，就是：
+
+$$
+\frac{d}{dc}\ell(cw)
+=\sum_i
+\underbrace{[\nabla\ell(cw)]_i}_{\text{在 }cw\text{ 处的第 }i\text{ 个梯度分量}}
+\underbrace{\frac{d(cw_i)}{dc}}_{=w_i}
+=\langle w,\nabla\ell(cw)\rangle.
+$$
+
+前面的尺度不变性则说明这个导数等于零。两者合起来，就有 ⟨w,∇ℓ(cw)⟩=0。
+
+为了得到当前参数 w 处的梯度，我们在求导之后取 c=1：此时 cw=w，∇ℓ(cw) 就是当前的 g=∇ℓ(w)。
+$$
+\underbrace{\left.\frac{d}{dc}\ell(cw)\right|_{c=1}}_{=0}
+=\langle w,\nabla\ell(w)\rangle
+=\langle w,g\rangle.
+$$
+
+### 垂直更新时，ELR 怎样决定转角与 AUS？
+
+**再看相对更新提供了什么条件。** blog1取 Δw=−η‖w‖g/‖g‖。对非零 w、g 与正的 η，这就是沿 −g 移动。因此，刚才的 g⊥w 会传递给 Δw，得到 Δw⊥w。
+
+下面把 g 和实际更新 Δw 都画出来。g 指向上方，沿负梯度的 Δw 指向下方；w 从原点指向旧端点，w+Δw 从原点指向新端点。原点、旧端点、新端点构成直角三角形，直角位于旧端点（第一张图中w指向的圆心），不在原点。参数维度更高时，也可以只看 w 与 Δw 张成的二维平面，直角关系不变。
+
+![沿负梯度的垂直更新与转角]({{ '/assets/img/blog/relative-updates/blog2-perpendicular-update-triangle.png' | relative_url }})
+
+我们关心的 θ 在原点处。相对于这个角，蓝色边 w 是邻边，橙色边 Δw 是对边，所以由直角三角形的定义：
+
+$$
+\underbrace{\tan\theta}_{\text{转角的正切}}
+=\frac{\underbrace{\lVert\Delta w\rVert}_{\text{对边：更新长度}}}
+{\underbrace{\lVert w\rVert}_{\text{邻边：原权重长度}}}
+=\eta_{\mathrm{eff}}.
+$$
+
+推导垂直关系的作用就在这里：它把原本还需要知道更新朝向的几何问题，变成了一个直角三角形。
+在这个尺度不变假设与当前梯度更新的组合下，ELR 是对边与邻边之比，因此能决定转角，也就能决定 AUS：
+
+$$
+\boxed{
+\theta=\arctan\eta_{\mathrm{eff}},\qquad
+\mathrm{AUS}=2\sin\!\left(\frac{\arctan\eta_{\mathrm{eff}}}{2}\right).
+}
+$$
+
+当相对步幅很小时，arctan η_eff≈η_eff，且 2sin(θ/2)≈θ，进一步得到 AUS≈η_eff。这里的“接近”来自小步下的几何近似。
+（但是，如果换成带动量的优化器，就会混入过去的梯度：过去梯度垂直于过去权重，不意味着它垂直于当前权重。）
+
+
+先沿用已经完成推导的相对更新，把结果合在一起：**在目标严格尺度不变、更新沿当前负梯度的条件下，设定 η 就能同时设定相对更新长度和转角：η_eff=η，θ=arctan η；小步时还有 AUS≈η。** 因此，我们已经可以**通过设定 η 或随训练调整 η，控制每一步方向变化的大小。**
+
+$$
+\tan\theta
+=\frac{\lVert\Delta w\rVert}{\lVert w\rVert}
+=\frac{\eta\lVert w\rVert}{\lVert w\rVert}
+=\eta.
+$$
+所以，在这些条件下，用 η 设定转角无需再固定权重模长：即使当前 ‖w‖ 变化，更新长度也按同一比例变化，两者的比值仍然是 η。
+## 控制相对步幅之后，再增加固定模长约束
+
+前面的相对更新，已经让我们能直接安排每步移动多远：
+
+$$
+\underbrace{\frac{\lVert\Delta w\rVert}{\lVert w\rVert}}_{\text{每步更新占当前权重长度的比例}}
+=\eta.
+$$
+
+例如，η=0.01 就表示更新向量的长度为当前权重长度的 1%。这个比例可以随训练调度；在前面已经推导的尺度不变、沿当前负梯度的条件下，它还决定转角 θ=arctan η。
+
+回顾blog1的两个要求：参数换一种存法，更新换算后仍然对应；整个损失乘一个正常数，更新不变。
+因此，我们可以直接用 η 设定每一步更新占当前权重长度的比例，并随训练调整这个比例。参数换一种表示，或整个损失乘一个正常数后，同样的 η 仍能使更新保持对应，不必为了补偿这些缩放而重新调整学习率。这些作用都没有要求权重模长固定。事实上，在刚才 Δw⊥w 的情形下，由勾股定理：
+
+$$
+\lVert w+\Delta w\rVert^2
+=\lVert w\rVert^2+\lVert\Delta w\rVert^2
+=\lVert w\rVert^2(1+\eta^2).
+$$
+
+权重会变长，但下一步的更新长度也会按新的模长计算，相对比例仍由 η 控制。
+
+固定模长，是再要求参数满足：
+
+$$
+\lVert w\rVert=R,\qquad R>0.
+$$
+
+所有满足这个条件的参数，构成以原点为中心、半径为 R 的超球面。二维时，它是一条圆周；三维时，它是球的表面；
+在更高维的参数空间中，我们称它为超球面。因此，“固定模长”和“把权重限制在超球面上”，说的是同一个约束。（但是这里的超球面针对当前参数块；若分别约束多个块，每个块都有自己的半径。）
+**已经能控制相对步幅，为什么还要把参数限制在超球面上？** 为了回答这个问题，我们先看尺度不变性允许我们做什么，再比较额外增加这个约束，究竟改变了哪一步。
+
+### 尺度不变时，为什么可以在超球面上选代表？
+
+从原点出发，沿 w 的方向延伸，就得到一条正射线。w/2、w、2w 都在这条射线上，方向相同，长度不同。在当前假定的 ℓ(cw)=ℓ(w) 下，它们的损失也相同。
+选定 R>0，每条正射线都与半径为 R 的超球面相交一次。我们可以用这个交点，代表该射线上不同长度的参数。下面画的是二维情形，绿色点是不同射线选出的代表。
+
+![每条正射线选择固定长度的代表]({{ '/assets/img/blog/relative-updates/blog2-ray-representatives.png' | relative_url }})
+
+以蓝色射线为例，w/2、w、2w 都对应同一个绿色交点：
+
+$$
+\underbrace{R}_{\text{统一采用的长度}}
+\underbrace{\frac{w}{\lVert w\rVert}}_{\text{保留原来的方向}}.
+$$
+
+由假设 ℓ(cw)=ℓ(w)，取 c=R/‖w‖，得到：
+
+$$
+\ell\!\left(R\frac{w}{\lVert w\rVert}\right)=\ell(w).
+$$
+
+其他射线也各选自己的交点：它们具有相同长度，却有不同方向，损失也可以不同。这样，限制到超球面上，并没有丢掉非零参数原本能够取得的损失值。
+但训练不是选一次代表就结束了。每次更新后恢复固定长度，得到的参数还会进入下一步梯度计算。**每个点都有同损失的球面代表，是否意味着每步投影后，整条训练轨迹也能保持对应？** 这需要继续比较更新，不能只凭当前损失相同作判断。
+
+## 拆开 Hyperball：相对更新与球面投影
+
+Hyperball 先选定半径 R=‖w₀‖，每一步先走到一个临时点，再拉回半径为 R 的超球面。记 N(x)=x/‖x‖：
+
+$$
+\begin{aligned}
+v&=w-\underbrace{\eta R}_{\text{投影前的步长}}
+\underbrace{\mathrm N(u)}_{\text{单位方向}},\\[0.7em]
+w^+&=\underbrace{R}_{\text{固定长度}}
+\underbrace{\mathrm N(v)}_{\text{临时点的单位方向}}.
+\end{aligned}
+$$
+
+这里 η 是 Hyperball 自己的步长系数；每一步开始时 ‖w‖=R。
+第一行利用 ‖w‖=R，执行我们已经讨论过的相对更新，v 是投影前的更新结果；第二行把 v 的长度恢复为 R，使参数重新落在超球面上。这里 u≠0、v≠0，才能进行相应的归一化。
+下图把这两个操作分开画，采用 u 与 w 垂直的情形。左图从超球面上的 w 出发，沿 −u 方向移动 ηR，得到 v，因此投影前的相对更新长度是 ‖v−w‖/R=η。直接相对更新到这里就结束，保留 v。
+
+右图接着处理同一个 v：保留从原点指向 v 的方向，只把长度恢复为 R，得到超球面上的 w⁺=Rv/‖v‖。图中 v 位于球面外，紫色虚线段表示恢复半径时缩去的长度；它不是另一条梯度或优化器更新方向。
+![先设定相对步幅更新到 v，再保留方向恢复半径 R]({{ '/assets/img/blog/relative-updates/blog2-relative-update-and-projection-two-steps-v2.png' | relative_url }})
+第二步不再计算一个新的优化器方向，而是将 v 乘一个正数 R/‖v‖，所以：
+
+$$
+\lVert w^+\rVert=R,
+\qquad
+\frac{w^+}{\lVert w^+\rVert}=\frac{v}{\lVert v\rVert}.
+$$
+
+因此，**投影改变了临时点的模长，保留了它的单位方向**，但投影后的实际位移是 w⁺−w，不再是 v−w。由于更新前的 w 与投影后的 w⁺ 都位于半径为 R 的超球面上：
+
+$$
+\underbrace{\frac{\lVert w^+-w\rVert}{R}}_{\text{最终实际 ELR}}
+=\left\lVert\frac{w^+}{R}-\frac{w}{R}\right\rVert
+=\mathrm{AUS}.
+$$
+
+它等于这次方向变化的弦长，根据前文推导，一般不严格等于投影前设定的 η。更新垂直于权重时有 tan θ=η，小步时两者才接近。
+blog1没有投影时，η 严格等于实际相对位移；加入投影以后，η 直接控制的是投影前的更新长度与 R 的比例，最终位移要按投影后的参数重新计算。
+
+**因此，Hyperball 在这里组合了两个操作：设定投影前的相对步幅，以及恢复固定半径。** 前一个操作已经决定了 v 的方向，后一个操作把这个方向上的参数放回超球面。要判断超球面约束额外贡献了什么，就需要把这两步分开比较。设计动机来自常规训练中的模长与步幅控制，先看不含权重衰减的常规更新 Δw=−ηu：相对更新长度是 η‖u‖/‖w‖，因此 η 不变时，这个比例仍会随 u 和 w 的模长变化。
+常规训练还会使用权重衰减。解耦权重衰减写成：
+
+$$
+w^+=
+\underbrace{(1-\eta\lambda)w}_{\text{将权重向零收缩}}
+-\underbrace{\eta u}_{\text{基础优化器的更新项}}.
+$$
+
+这里 η 是常规学习率，λ 是权重衰减系数。在 0<ηλ<1 时，前一项把权重向零收缩，后一项加入优化器更新，两者共同影响模长的演化。通过影响模长，权重衰减也会间接参与方向步幅的控制。
+η‖u‖/‖w‖ 只描述更新项的相对大小，并不是包含衰减的总位移比值。
+Hyperball 选择显式固定矩阵模长，同时归一化基础优化器的更新，以减少步幅对这两个模长变化的依赖。
+这解释了作者为什么组合使用更新归一化与固定模长，但我们已经实现相对步幅控制，接下来要单独比较的是投影这一步。
+
+## 何时增加投影，仍得到相同的损失轨迹？
+
+前面只比较了同一步。现在继续问：两种更新能不能在整个训练过程中，都保持相同的权重方向？
+为把投影本身的作用算清楚，我们比较blog1的相对更新，以及在同一更新后增加投影的版本。先只训练一个参数块，其余参数固定，并让每一步的损失都严格满足 ℓ(cw)=ℓ(w)。这样，同一条射线上不同模长处的损失相同。
+两条路径从同一非零初始化出发，每步使用相同数据与相同的系数 η；更新只使用当前梯度，不加入动量、权重衰减或其他历史状态。
+下面证明：**每一步的单位方向相同，两条路径在对应步的损失也相同。**
+先求同一条射线上不同位置的梯度关系。与前面固定 w、对 c 求导不同，这里固定 c，对等式 ℓ(cw)=ℓ(w) 两边的 w 求梯度。左边每个输入分量 cwᵢ 对 wᵢ 的导数是 c，由链式法则：
+
+$$
+c\,\nabla\ell(cw)=\nabla\ell(w)
+\quad\Longrightarrow\quad
+g(cw)=g(w)/c.
+$$
+
+因此，在梯度非零时，同一条射线上不同位置的梯度单位方向相同：
+
+$$
+g(cw)=g(w)/c
+\quad\Longrightarrow\quad
+\frac{g(cw)}{\lVert g(cw)\rVert}
+=\frac{g(w)}{\lVert g(w)\rVert}.
+$$
+
+两条路径从同一个非零初始参数出发，所以最初的单位方向相同。接下来只需证明：如果某一步方向相同，更新后方向仍然相同，就能把这个关系逐步延续下去。
+设这一时刻两条路径分别位于 w 和 Rw/‖w‖，即模长可以不同，单位方向相同。由刚才推出的梯度关系，它们使用的梯度单位方向也相同。下一步可以分别写成：
+
+$$
+\begin{aligned}
+\text{直接相对更新：}\quad
+&\lVert w\rVert\left(
+\frac{w}{\lVert w\rVert}-\eta\frac{g(w)}{\lVert g(w)\rVert}
+\right),\\[0.8em]
+\text{固定半径的投影更新：}\quad
+&R\,\mathrm N\!\left(
+\frac{w}{\lVert w\rVert}-\eta\frac{g(w)}{\lVert g(w)\rVert}
+\right).
+\end{aligned}
+$$
+
+两行括号里的向量完全相同，所以下一步仍在同一条正射线上。第一条路径留下自己的长度，第二条路径恢复半径 R。
+从相同的非零初始化出发，这个关系可以一步步保持。目标又不依赖射线上的长度，因此每一步的损失相同。
+上面的归一化式用于梯度非零的步骤；若梯度为零，两条路径的梯度同时为零，我们约定本步都不更新，方向和损失仍然对应。
+**在这个训练问题里，直接相对更新已经保持了相同的方向递推；投影只固定了半径，不会额外改善损失轨迹。** 
+
+## 回看 SGD：模长怎样影响转角？
+
+刚才的证明中，两条路径的权重模长可以不同，方向和损失轨迹却始终相同。关键不只是目标满足尺度不变性，还在于更新规则怎样使用梯度。用普通 SGD 作对照，就能看清相对更新消去了什么影响。
+即使目标满足 ℓ(cw)=ℓ(w)，梯度仍然满足刚才推出的关系：
+
+$$
+g(cw)=g(w)/c.
+$$
+
+沿同一条射线把权重放大 c 倍，当前损失没有变，梯度却变成原来的 1/c。普通 SGD 保持同一个学习率时，更新长度也变成原来的 1/c；同时，权重长度变成 c 倍。因此，相对更新长度变成原来的 1/c²。在这个尺度不变目标下，梯度与权重垂直，转角的正切也变成原来的 1/c²。
+
+**损失不依赖权重模长，不代表优化器的更新也不依赖它。** 如果这里的尺度不变性来自模型预测不随模长变化，那么当前预测相同的参数，也可能因为模长不同而得到不同的后续训练。
+相对更新则先归一化当前梯度，消去梯度长度的差异，再按当前权重长度确定更新长度。权重放大多少，更新就放大多少，因此两者的比值不变。
+下面用图单独比较模长对转角的影响。先固定本步的 u，只比较权重模长不同的两个点，并取 u 与权重垂直，隔离模长对单步转角的影响；实际训练中的 u 本身也可能随参数改变。
+![绝对更新与相对更新对转角的不同影响]({{ '/assets/img/blog/relative-updates/blog2-absolute-and-relative-angle.png' | relative_url }})
+
+左图中，w₁、w₂ 是两个三角形的邻边，Δw₁、Δw₂ 是各自的对边。两次更新等长，即 ‖Δw₁‖=‖Δw₂‖；但 w₂ 比 w₁ 长，即 ‖w₂‖>‖w₁‖。因此，第二个三角形的对边长度没变、邻边更长，转角就更小，即 θ₂<θ₁。也就是说，常规学习率不变，也不代表方向步幅不变；它还受到当前权重模长和 u 的影响。
+
+右图采用我们前面讨论的相对更新：邻边从 w₁ 变成更长的 w₂ 时，对边也从 Δw₁ 同比放大为 Δw₂，因此 ‖Δw₁‖/‖w₁‖=‖Δw₂‖/‖w₂‖=η。两个直角三角形的对边与邻边之比相同，所以转角也相同，图中统一记为 θ。这说明我们已经有一种不固定模长、也能消去这项模长影响的做法。
+
+这里比较每一步的权重方向，是为了判断：在相对更新之后增加投影，是否会改变后续损失。因为当前假设 ℓ(cw)=ℓ(w)，只要两种方法在对应步骤位于同一条正射线上，它们的损失就相同。前面的证明说明，在严格尺度不变、只使用当前归一化梯度，并采用相同初始化、数据和 η 序列的条件下，即使不把权重拉回超球面，也能得到与投影训练相同的方向和损失轨迹。因此，在这个比较中，额外投影没有带来额外的损失下降。
+
+## 实际训练的差异，会从哪里出现？
+
+既然在刚才的情形中，额外投影没有改变损失轨迹，那么实际训练中加入投影后若出现收益，就需要找出两条路径在哪个环节开始不同。沿着证明使用的条件，可以依次看历史状态、模型对模长的依赖，以及实际步幅序列。
+
+### 历史状态：模长差异怎样影响后续更新？
+刚才每一步只使用当前梯度，所以一个整体倍数可以在归一化时消去。加入动量后，更新会混合过去与当前的梯度。如果两条路径在各步的模长比不同，梯度序列就分别带上不同的缩放倍数，不能再从整个累积结果中提出一个共同倍数消掉。它们在混合结果中的相对权重可能改变，归一化后的更新方向也就可能不同。
+这说明，投影虽然保留了本步 v 的单位方向，却可能通过改变模长，影响以后梯度与状态的递推。此时要比较的，是投影怎样改变了后续更新方向，不能只看本步投影前后的方向是否相同。
+
+### 模型计算：模长影响损失时，投影改变了什么？
+前面的证明还依赖 ℓ(cw)=ℓ(w)。如果这个条件不成立，把 v 拉回超球面，就可能直接改变损失：
+
+$$
+\ell(v)\ne\ell\!\left(R\mathrm N(v)\right).
+$$
+
+因为在同一个 ℓ 上改变实际参数，没有像blog1那样定义一个新的 ℓ̂，在前向中把缩放除回去。此时，在超球面上选代表就不再保证损失不变，投影也可能改变下一步前向计算与梯度。
+
+### 步幅调度：相同的 η，是否代表相同的方向步幅？
+即使模型与优化器条件相同，比较时还需要检查 η 的含义。前面的轨迹证明让两条路径使用相同的投影前相对更新系数；但普通优化器中的学习率、投影前的 η，以及投影后的实际相对位移，并不是同一个量。因此，给不同方法使用相同的学习率数值或衰减曲线，并不意味着它们经历了相同的方向步幅序列。如果一次比较同时改变了实际步幅、调度和模长约束，就无法只根据最终损失，把收益全部归给超球面。要识别约束的额外贡献，应当先核对实际相对位移与 AUS 的变化，再比较模型计算和历史状态的差异。
+
+## 把相对步幅控制的收益，与超球面约束的作用分开
+比较加入投影前后的训练结果要分清：实际步幅是否发生了变化，以及恢复固定半径是否在此之外改变了训练。相对更新已经能让 η 直接控制每步更新长度占当前权重长度的比例；在严格尺度不变、只使用当前梯度的相对更新中，采用相同的 η 序列，额外投影还保持了同样的方向和损失轨迹。在这个情形里，步幅控制已经由更新规则完成，把参数留在超球面上没有带来额外的损失下降。**控制相对步幅，不需要先锁住权重模长；不能把相对步幅控制的价值，全部归给超球面约束。** 训练中如果观察到额外收益，就要进一步解释，投影怎样改变了模型计算、历史状态或步幅序列。
+
+这也让blog1两个要求的用途更具体：参数换一种表示后，更新换算回来仍然对应；整个损失乘一个正常数后，更新保持不变。我们不必仅仅为了补偿这些缩放而重新调整学习率。blog2进一步说明，当权重模长不影响损失时，普通 SGD 仍会因为梯度随模长变化而改变方向步幅；相对更新则能在前面证明的无历史情形中消去这种影响。**权重模长不影响当前损失，不意味着它不影响后续训练；但处理这种影响，也不一定需要把模长固定住。**
+
+优化器怎样使用权重模长，解决指定缩放下的更新对应与步幅控制问题，以及是否把权重模长固定在 R。把两者分开，才能判断 Hyperball 组合设计中的训练收益，究竟来自哪项改变。
+
+## 参考资料
+
+- 苏剑林：[《从参数对称性到有效学习率》](https://kexue.fm/archives/11985)。
+- Hunyuan Pretrain Team：[From LR to ELR: A Better Heuristic for Pretraining Dynamics](https://hy.tencent.com/research/elr?langVersion=zh)。
+- Fox：[《对尺度不变性的基本理解》](https://happyfox.dev/blog/attention-update-geometry/)。
+- Wen et al.：[Fantastic Pretraining Optimizers and Where to Find Them II: Hyperball Optimization](https://arxiv.org/html/2606.16899v2)。
+- Xiao et al.：[Hyperball May Not Be a Free Lunch](https://arxiv.org/html/2607.22444v1)。
+- Yuan et al.：[HyperTransfer: Understanding the Equivalence between Base Optimizer and Hyperball](https://arxiv.org/html/2609.07017v1)。
+<!-- article-source:end -->
+
+<nav class="blog-series" aria-label="相对更新系列">
+  <strong>相对更新系列</strong><br>
+  <a href="{{ '/blog/2026/invariance-to-relative-updates/' | relative_url }}">blog1 · 从缩放不变性要求推导优化器</a>
+  <a href="{{ '/blog/2026/relative-updates-and-hypersphere/' | relative_url }}">blog2 · 相对更新之后：超球面约束额外改变了什么？</a>
+</nav>
+
+
+<section class="blog-feedback" aria-labelledby="feedback-title">
+  <h2 id="feedback-title">留言与精选讨论</h2>
+  <p>留言通过 <a href="https://formsubmit.co/" rel="noopener noreferrer" target="_blank">FormSubmit</a> 发到我的邮箱，不会自动公开。只有经你同意并由我精选的留言及回复，才会展示在这里；邮箱不会公开。</p>
+  {% assign selected_comments = site.data.blog_comments[page.comment_key] %}
+  {% if selected_comments.size > 0 %}
+    <h3>精选讨论</h3>
+    {% for comment in selected_comments %}
+      <div class="blog-selected-comment">
+        <p><strong>{{ comment.author | escape }}</strong>{% if comment.date %} · <time>{{ comment.date | escape }}</time>{% endif %}</p>
+        <p>{{ comment.message | escape | newline_to_br }}</p>
+        {% if comment.reply and comment.reply != '' %}
+          <div class="author-reply">
+            <p><strong>{{ site.first_name | escape }} {{ site.last_name | escape }} 回复</strong>{% if comment.reply_date %} · <time>{{ comment.reply_date | escape }}</time>{% endif %}</p>
+            <p>{{ comment.reply | escape | newline_to_br }}</p>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="feedback-note">暂时还没有公开的精选留言。</p>
+  {% endif %}
+  <form action="https://formsubmit.co/{{ site.data.socials.email | escape }}" method="POST" accept-charset="UTF-8">
+    <input type="hidden" name="_subject" value="[博客留言] {{ page.title | escape }}">
+    <input type="hidden" name="_next" value="{{ '/blog/message-received/' | absolute_url }}">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="article" value="{{ page.title | escape }}">
+    <input type="hidden" name="article_url" value="{{ page.url | absolute_url }}">
+    <input type="text" name="_honey" style="display: none" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label for="feedback-name">姓名或昵称
+      <input id="feedback-name" name="name" type="text" autocomplete="nickname" maxlength="80" required>
+    </label>
+    <label for="feedback-email">邮箱（可选，用于私下回复，不会公开）
+      <input id="feedback-email" name="email" type="email" autocomplete="email" maxlength="254">
+    </label>
+    <label for="feedback-message">留言
+      <textarea id="feedback-message" name="message" maxlength="10000" required></textarea>
+    </label>
+    <label class="consent" for="feedback-consent">
+      <input id="feedback-consent" name="permission_to_publish" type="checkbox" value="yes">
+      <span>我同意作者将这条留言与所用昵称精选公开。不勾选则仅作私下交流。</span>
+    </label>
+    <button type="submit">发送私密留言</button>
+  </form>
+</section>
