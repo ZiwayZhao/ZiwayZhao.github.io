@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1450" height="485" viewBox="40 155 1450 485" role="img" aria-labelledby="title desc">
+  <title id="title">绝对更新与相对更新对转角的不同影响</title>
+  <desc id="desc">两图均比较同一射线上两个不同模长的权重，更新与权重垂直。左图固定相同更新长度，较短权重的转角更大。右图让更新长度与权重长度同比变化，两条更新后的权重同向，转角相同。</desc>
+  <defs>
+    <marker id="blue" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#2864b4"/></marker>
+    <marker id="orange" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#b65a14"/></marker>
+    <marker id="green" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#137b63"/></marker>
+    <style>
+      text{font-family:'Times New Roman','STIX Two Math',serif;font-size:34px;font-style:italic;fill:#243346;}
+      .fraction{font-size:30px;}
+    </style>
+  </defs>
+  <rect x="0" y="40" width="1550" height="600" fill="#fff"/>
+  <line x1="100" y1="420" x2="540" y2="420" stroke="#2864b4" stroke-width="4" marker-end="url(#blue)"/>
+  <line x1="100" y1="420" x2="320" y2="250" stroke="#137b63" stroke-width="4" marker-end="url(#green)"/>
+  <line x1="100" y1="420" x2="540" y2="250" stroke="#137b63" stroke-width="3" stroke-dasharray="7 6" marker-end="url(#green)"/>
+  <line x1="320" y1="420" x2="320" y2="250" stroke="#b65a14" stroke-width="4" marker-end="url(#orange)"/>
+  <line x1="540" y1="420" x2="540" y2="250" stroke="#b65a14" stroke-width="4" marker-end="url(#orange)"/>
+  <path d="M300,420 L300,400 L320,400 M520,420 L520,400 L540,400" stroke="#7b899a" stroke-width="2" fill="none"/>
+  <path d="M180,420 A80,80 0 0 0 163.3,371.09" stroke="#64748b" stroke-width="2" fill="none"/>
+  <path d="M235,420 A135,135 0 0 0 225.92,371.35" stroke="#64748b" stroke-width="2" fill="none"/>
+  <circle cx="100" cy="420" r="4.5" fill="#243346"/>
+  <circle cx="320" cy="420" r="5" fill="#2864b4"/>
+  <circle cx="540" cy="420" r="5" fill="#2864b4"/>
+  <circle cx="320" cy="250" r="5" fill="#137b63"/>
+  <circle cx="540" cy="250" r="5" fill="#137b63"/>
+  <text x="143" y="360">θ₁</text>
+  <text x="245" y="405">θ₂</text>
+  <text x="338" y="383" style="fill:#b65a14">Δw₁</text>
+  <text x="564" y="340" style="fill:#b65a14">Δw₂</text>
+  <text x="295" y="467" style="fill:#2864b4">w₁</text>
+  <text x="515" y="467" style="fill:#2864b4">w₂</text>
+  <text x="185" y="550">‖Δw₁‖ = ‖Δw₂‖</text>
+  <text x="220" y="594">‖w₂‖ &gt; ‖w₁‖</text>
+  <line x1="860" y1="420" x2="1300" y2="420" stroke="#2864b4" stroke-width="4" marker-end="url(#blue)"/>
+  <line x1="860" y1="420" x2="1300" y2="200" stroke="#137b63" stroke-width="4" marker-end="url(#green)"/>
+  <line x1="1080" y1="420" x2="1080" y2="310" stroke="#b65a14" stroke-width="4" marker-end="url(#orange)"/>
+  <line x1="1300" y1="420" x2="1300" y2="200" stroke="#b65a14" stroke-width="4" marker-end="url(#orange)"/>
+  <path d="M1060,420 L1060,400 L1080,400 M1280,420 L1280,400 L1300,400" stroke="#7b899a" stroke-width="2" fill="none"/>
+  <path d="M950,420 A90,90 0 0 0 940.5,379.75" stroke="#64748b" stroke-width="2" fill="none"/>
+  <circle cx="860" cy="420" r="4.5" fill="#243346"/>
+  <circle cx="1080" cy="420" r="5" fill="#2864b4"/>
+  <circle cx="1300" cy="420" r="5" fill="#2864b4"/>
+  <circle cx="1080" cy="310" r="5" fill="#137b63"/>
+  <circle cx="1300" cy="200" r="5" fill="#137b63"/>
+  <text x="958" y="405">θ</text>
+  <text x="1105" y="363" style="fill:#b65a14">Δw₁</text>
+  <text x="1325" y="320" style="fill:#b65a14">Δw₂</text>
+  <text x="1055" y="467" style="fill:#2864b4">w₁</text>
+  <text x="1275" y="467" style="fill:#2864b4">w₂</text>
+  <text x="1000" y="532" class="fraction" text-anchor="middle">‖Δw₁‖</text>
+  <line x1="947" y1="546" x2="1053" y2="546" stroke="#243346" stroke-width="1.5"/>
+  <text x="1000" y="581" class="fraction" text-anchor="middle">‖w₁‖</text>
+  <text x="1090" y="557">=</text>
+  <text x="1210" y="532" class="fraction" text-anchor="middle">‖Δw₂‖</text>
+  <line x1="1157" y1="546" x2="1263" y2="546" stroke="#243346" stroke-width="1.5"/>
+  <text x="1210" y="581" class="fraction" text-anchor="middle">‖w₂‖</text>
+  <text x="1290" y="557">= η</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="540" viewBox="70 165 1000 450" role="img" aria-labelledby="title desc">
+  <title id="title">更新量的方向与权重方向的变化</title>
+  <desc id="desc">w 为更新前权重，Δw 为更新量，w 加 Δw 为更新后权重，θ 为新旧权重的夹角。</desc>
+  <defs>
+    <marker id="blue-arrow" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#2864b4"/></marker>
+    <marker id="green-arrow" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#137b63"/></marker>
+    <marker id="orange-arrow" markerWidth="12" markerHeight="12" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L11,5 L0,10 Z" fill="#b65a14"/></marker>
+    <style>
+      text {font-family: 'PingFang SC','Noto Sans CJK SC','Arial',sans-serif;fill:#243346;}
+      .label {font-size:27px;}
+      .small {font-size:23px;fill:#516174;}
+      .math {font-size:36px;font-family:'Times New Roman','STIX Two Math',serif;font-style:italic;}
+    </style>
+  </defs>
+  <rect x="70" y="165" width="1000" height="450" fill="#ffffff"/>
+  <line x1="150" y1="505" x2="865" y2="505" stroke="#d6dfe8" stroke-width="2"/>
+  <line x1="150" y1="505" x2="800" y2="505" stroke="#2864b4" stroke-width="5" marker-end="url(#blue-arrow)"/>
+  <line x1="150" y1="505" x2="680" y2="205" stroke="#137b63" stroke-width="5" marker-end="url(#green-arrow)"/>
+  <line x1="800" y1="505" x2="680" y2="205" stroke="#b65a14" stroke-width="5" marker-end="url(#orange-arrow)"/>
+  <circle cx="150" cy="505" r="5" fill="#243346"/>
+  <circle cx="800" cy="505" r="5" fill="#2864b4"/>
+  <circle cx="680" cy="205" r="5" fill="#137b63"/>
+  <path d="M280,505 A130,130 0 0 0 263.12,440.97" stroke="#64748b" stroke-width="2.5" fill="none"/>
+  <text x="108" y="548" class="label">原点</text>
+  <text x="445" y="547" class="math" style="fill:#2864b4">w</text>
+  <text x="415" y="580" class="small">更新前的权重</text>
+  <text x="280" y="265" class="math" style="fill:#137b63">w + Δw</text>
+  <text x="280" y="300" class="small">更新后的权重</text>
+  <text x="780" y="305" class="math" style="fill:#b65a14">Δw</text>
+  <text x="850" y="306" class="label">更新量</text>
+  <text x="306" y="473" class="math">θ</text>
+  <text x="368" y="455" class="label">新旧权重的夹角</text>
+</svg>

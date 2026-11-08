@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="730" viewBox="0 0 1440 730" role="img" aria-labelledby="title desc">
+<title id="title">相对更新与恢复固定半径是两个操作</title>
+<desc id="desc">左图从球面上的 w 沿负 u 方向更新长度 ηR，到达 v。右图保持 v 的正射线方向，把参数长度恢复为 R，得到 w⁺。紫色虚线只标示缩去的长度，没有更新箭头。图示 u 与 w 垂直的情形。</desc>
+<defs>
+ <marker id="blue" markerWidth="11" markerHeight="11" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L10 5 L0 10 Z" fill="#2864b4"/></marker>
+ <marker id="orange" markerWidth="11" markerHeight="11" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L10 5 L0 10 Z" fill="#b65a14"/></marker>
+ <marker id="green" markerWidth="11" markerHeight="11" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L10 5 L0 10 Z" fill="#137b63"/></marker>
+ <style>text{font-family:'PingFang SC','Arial',sans-serif;fill:#243346} .op{font-size:27px;font-weight:500} .math{font-family:'Times New Roman','STIX Two Math',serif;font-style:italic;font-size:30px} .small{font-size:24px} .sphere{stroke:#b7c4d2;stroke-width:2;fill:none}</style>
+</defs>
+<rect width="1440" height="730" fill="white"/>
+<line x1="720" y1="48" x2="720" y2="695" stroke="#e3e9ef" stroke-width="2"/>
+<!-- Step one: an optimizer update starts at the current endpoint. -->
+<g>
+ <text x="90" y="65" class="op">① 设定相对步幅，更新到 v</text>
+ <text x="90" y="120" class="math">v = w − ηR · u/‖u‖</text>
+ <circle cx="230" cy="420" r="180" class="sphere"/>
+ <line x1="230" y1="420" x2="410" y2="240" stroke="#bbc5ce" stroke-width="2" stroke-dasharray="6 7"/>
+ <line x1="230" y1="420" x2="410" y2="420" stroke="#2864b4" stroke-width="4" marker-end="url(#blue)"/>
+ <line x1="410" y1="420" x2="410" y2="240" stroke="#b65a14" stroke-width="5" marker-end="url(#orange)"/>
+ <path d="M392 420 L392 402 L410 402" fill="none" stroke="#8393a4" stroke-width="2"/>
+ <circle cx="230" cy="420" r="4" fill="#243346"/>
+ <circle cx="410" cy="420" r="5" fill="#2864b4"/>
+ <circle cx="410" cy="240" r="6" fill="#b65a14"/>
+ <text x="203" y="458" class="math">O</text>
+ <text x="432" y="446" class="math" style="fill:#2864b4">w</text>
+ <text x="432" y="236" class="math" style="fill:#b65a14">v</text>
+ <text x="292" y="456" class="math">R</text>
+ <text x="438" y="329" class="math" style="fill:#b65a14">ηR</text>
+ <text x="438" y="366" class="math" style="fill:#b65a14">沿 −u</text>
+ <text x="90" y="675" class="math">‖w‖ = R， ‖v − w‖/R = η</text>
+</g>
+<!-- Step two: rescale the endpoint on its ray; no new update direction is drawn. -->
+<g transform="translate(720 0)">
+ <text x="70" y="65" class="op">② 保留方向，恢复半径 R</text>
+ <text x="70" y="120" class="math">w⁺ = R · v/‖v‖</text>
+ <circle cx="230" cy="420" r="180" class="sphere"/>
+ <line x1="230" y1="420" x2="410" y2="420" stroke="#2864b4" stroke-width="2" stroke-opacity="0.35"/>
+ <line x1="230" y1="420" x2="436" y2="214" stroke="#a9bab7" stroke-width="2" stroke-dasharray="5 7"/>
+ <line x1="357.279" y1="292.721" x2="410" y2="240" stroke="#8055ab" stroke-width="4" stroke-dasharray="6 6"/>
+ <line x1="230" y1="420" x2="357.279" y2="292.721" stroke="#137b63" stroke-width="4.5" marker-end="url(#green)"/>
+ <circle cx="230" cy="420" r="4" fill="#243346"/>
+ <circle cx="410" cy="420" r="4" fill="#2864b4" fill-opacity="0.5"/>
+ <circle cx="410" cy="240" r="6" fill="#b65a14"/>
+ <circle cx="357.279" cy="292.721" r="6" fill="#137b63"/>
+ <text x="203" y="458" class="math">O</text>
+ <text x="432" y="446" class="math" style="fill:#2864b4">w</text>
+ <text x="432" y="236" class="math" style="fill:#b65a14">v</text>
+ <text x="279" y="285" class="math" style="fill:#137b63">w⁺</text>
+ <text x="241" y="360" class="math" style="fill:#137b63">R</text>
+ <path d="M392 276 L448 294" stroke="#8055ab" stroke-width="1.5" fill="none"/>
+ <text x="460" y="308" class="math" style="fill:#8055ab">‖v‖ → R</text>
+ <text x="70" y="675" class="math">‖w⁺‖ = R， w⁺/‖w⁺‖ = v/‖v‖</text>
+</g>
+</svg>

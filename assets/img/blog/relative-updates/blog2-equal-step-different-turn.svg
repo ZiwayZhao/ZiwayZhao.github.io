@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="612" viewBox="50 140 1100 510" role="img" aria-labelledby="title desc">
+  <title id="title">等长更新对应不同权重转角</title>
+  <desc id="desc">固定权重 w 从原点指向圆心。两条等长更新 Δw₁ 与 Δw₂ 从圆心分别向左和向上，终点都在同一个圆上。向左更新保持原权重方向，向上更新使权重与原方向形成正夹角 θ。</desc>
+  <defs>
+    <marker id="blue" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 Z" fill="#2864b4"/></marker>
+    <marker id="orange" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 Z" fill="#b65a14"/></marker>
+    <marker id="green" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 Z" fill="#137b63"/></marker>
+    <style>
+      text{font-family:'PingFang SC','Arial',sans-serif;fill:#243346;}
+      .label{font-size:27px;}
+      .math{font-family:'Times New Roman','STIX Two Math',serif;font-size:35px;font-style:italic;}
+    </style>
+  </defs>
+  <rect width="1320" height="660" fill="#fff"/>
+  <circle cx="850" cy="390" r="190" fill="none" stroke="#aab8c8" stroke-width="2" stroke-dasharray="7 7"/>
+  <line x1="110" y1="390" x2="1090" y2="390" stroke="#d6dfe8" stroke-width="2"/>
+  <line x1="110" y1="390" x2="850" y2="390" stroke="#2864b4" stroke-width="4.5" marker-end="url(#blue)"/>
+  <line x1="110" y1="390" x2="850" y2="200" stroke="#137b63" stroke-width="4.5" marker-end="url(#green)"/>
+  <line x1="850" y1="390" x2="660" y2="390" stroke="#b65a14" stroke-width="5" marker-end="url(#orange)"/>
+  <line x1="850" y1="390" x2="850" y2="200" stroke="#b65a14" stroke-width="5" marker-end="url(#orange)"/>
+  <circle cx="110" cy="390" r="5" fill="#243346"/>
+  <circle cx="850" cy="390" r="5" fill="#2864b4"/>
+  <circle cx="660" cy="390" r="5" fill="#137b63"/>
+  <circle cx="850" cy="200" r="5" fill="#137b63"/>
+  <path d="M280,390 A170,170 0 0 0 274.66,347.72" stroke="#64748b" stroke-width="2.5" fill="none"/>
+  <text x="71" y="438" class="label">原点</text>
+  <text x="884" y="430" class="math" style="fill:#2864b4">w</text>
+  <text x="694" y="360" class="math" style="fill:#b65a14">Δw₁</text>
+  <text x="876" y="300" class="math" style="fill:#b65a14">Δw₂</text>
+  <text x="570" y="455" class="math">w + Δw₁</text>
+  <text x="875" y="180" class="math">w + Δw₂</text>
+  <text x="302" y="366" class="math">θ &gt; 0</text>
+  <text x="596" y="495" class="math">θ = 0</text>
+  <text x="705" y="626" class="math">‖Δw₁‖ = ‖Δw₂‖</text>
+</svg>

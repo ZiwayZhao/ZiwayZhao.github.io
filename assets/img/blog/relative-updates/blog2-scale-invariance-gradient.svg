@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="570" viewBox="0 60 1600 570" role="img" aria-labelledby="title desc">
+  <title id="title">尺度不变性、径向平坦与梯度垂直</title>
+  <desc id="desc">左图中，同一条射线上的 w/2、w、2w 具有相同损失，当前梯度 g 垂直于射线，指向损失较高的方向。右图中固定 w 后，损失 ℓ(cw) 随正常数 c 变化是一条水平线，c=1 对应当前参数 w。</desc>
+  <defs>
+    <marker id="blue" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 Z" fill="#2864b4"/></marker>
+    <marker id="purple" markerWidth="13" markerHeight="13" refX="11" refY="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L12,6 L0,12 Z" fill="#8055ab"/></marker>
+    <marker id="axis" markerWidth="11" markerHeight="11" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#778494"/></marker>
+    <style>
+      text{font-family:'PingFang SC','Arial',sans-serif;fill:#243346;}
+      .label{font-size:29px;}
+      .math{font-family:'Times New Roman','STIX Two Math',serif;font-size:36px;font-style:italic;}
+      .tick{font-family:'Times New Roman',serif;font-size:30px;}
+    </style>
+  </defs>
+  <rect x="0" y="60" width="1600" height="570" fill="#fff"/>
+  <line x1="70" y1="350" x2="780" y2="130" stroke="#b6c2d0" stroke-width="2"/>
+  <line x1="70" y1="350" x2="780" y2="570" stroke="#b6c2d0" stroke-width="2"/>
+  <line x1="70" y1="350" x2="815" y2="350" stroke="#a6b6c9" stroke-width="2.5"/>
+  <line x1="70" y1="350" x2="420" y2="350" stroke="#2864b4" stroke-width="4.5" marker-end="url(#blue)"/>
+  <line x1="420" y1="350" x2="420" y2="185" stroke="#8055ab" stroke-width="4.5" marker-end="url(#purple)"/>
+  <path d="M398,350 L398,328 L420,328" stroke="#64748b" stroke-width="2.5" fill="none"/>
+  <circle cx="70" cy="350" r="5" fill="#243346"/>
+  <circle cx="245" cy="350" r="5" fill="#2864b4"/>
+  <circle cx="420" cy="350" r="5" fill="#2864b4"/>
+  <circle cx="770" cy="350" r="5" fill="#2864b4"/>
+  <text x="31" y="402" class="label">原点</text>
+  <text x="210" y="383" class="math">w/2</text>
+  <text x="405" y="402" class="math" style="fill:#2864b4">w</text>
+  <text x="742" y="402" class="math">2w</text>
+  <text x="450" y="220" class="math" style="fill:#8055ab">g</text>
+  <text x="645" y="110" class="label">损失较高</text>
+  <text x="645" y="615" class="label">损失较低</text>
+  <text x="680" y="320" class="math">ℓ(w)</text>
+  <line x1="1000" y1="490" x2="1540" y2="490" stroke="#778494" stroke-width="2" marker-end="url(#axis)"/>
+  <line x1="1000" y1="490" x2="1000" y2="155" stroke="#778494" stroke-width="2" marker-end="url(#axis)"/>
+  <line x1="1040" y1="300" x2="1500" y2="300" stroke="#137b63" stroke-width="4"/>
+  <line x1="1230" y1="300" x2="1230" y2="490" stroke="#b6c2d0" stroke-width="2" stroke-dasharray="6 6"/>
+  <circle cx="1115" cy="300" r="5" fill="#137b63"/>
+  <circle cx="1230" cy="300" r="6" fill="#2864b4"/>
+  <circle cx="1460" cy="300" r="5" fill="#137b63"/>
+  <line x1="1115" y1="485" x2="1115" y2="495" stroke="#778494" stroke-width="2"/>
+  <line x1="1230" y1="485" x2="1230" y2="495" stroke="#778494" stroke-width="2"/>
+  <line x1="1460" y1="485" x2="1460" y2="495" stroke="#778494" stroke-width="2"/>
+  <text x="1115" y="534" class="tick" text-anchor="middle">½</text>
+  <text x="1230" y="534" class="tick" text-anchor="middle">1</text>
+  <text x="1460" y="534" class="tick" text-anchor="middle">2</text>
+  <text x="970" y="122" class="math">ℓ(cw)</text>
+  <text x="1550" y="500" class="math">c</text>
+  <text x="1045" y="274" class="math" style="fill:#137b63">ℓ(w)</text>
+</svg>
