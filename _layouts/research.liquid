@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="{{ page.lang | default: 'zh-CN' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      {{ page.title | escape }}
+      ·
+      {{ site.first_name | escape }}
+      {{ site.last_name | escape }}
+    </title>
+    <meta name="description" content="{{ page.description | default: site.description | strip_html | escape }}">
+    <meta name="author" content="{{ site.first_name | escape }} {{ site.last_name | escape }}">
+    <link rel="canonical" href="{{ page.url | absolute_url }}">
+    <meta property="og:type" content="{% if page.research_index %}website{% else %}article{% endif %}">
+    <meta property="og:title" content="{{ page.title | escape }}">
+    <meta property="og:description" content="{{ page.description | default: site.description | strip_html | escape }}">
+    <meta property="og:url" content="{{ page.url | absolute_url }}">
+    <link rel="icon" type="image/svg+xml" href="{{ '/assets/img/favicon.svg' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/research/reading.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+    {% unless page.research_index %}
+      <link rel="stylesheet" href="{{ '/assets/vendor/katex/katex-swap.min.css' | relative_url }}">
+      <link rel="preload" href="{{ '/assets/vendor/katex/fonts/KaTeX_Main-Regular.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+      <link rel="preload" href="{{ '/assets/vendor/katex/fonts/KaTeX_Math-Italic.woff2' | relative_url }}" as="font" type="font/woff2" crossorigin>
+      <script defer src="{{ '/assets/vendor/katex/katex.min.js' | relative_url }}"></script>
+      <script defer src="{{ '/assets/vendor/katex/auto-render.min.js' | relative_url }}"></script>
+    {% endunless %}
+    <script defer src="{{ '/assets/research/reading.js' | relative_url }}?v={{ site.time | date: '%s' }}"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到正文</a>
+    <header class="site-header">
+      <a class="site-name" href="{{ '/' | relative_url }}">
+        {{- site.first_name }}
+        {{ site.last_name -}}
+      </a>
+      <nav class="site-nav" aria-label="网站导航">
+        <a href="{{ '/' | relative_url }}">主页</a>
+        <a href="{{ '/blog/' | relative_url }}" aria-current="{% if page.research_index %}page{% else %}false{% endif %}">博客</a>
+      </nav>
+    </header>
+    {% if page.research_index %}
+      <main id="main-content" class="notes-index">
+        <header class="index-header">
+          <p class="eyebrow">RESEARCH NOTES</p>
+          <h1>研究笔记</h1>
+          <p class="index-description">关于优化、学习与模型训练的推导和思考。</p>
+        </header>
+        {{ content }}
+      </main>
+    {% else %}
+      {% capture article_toc %}{% toc %}{% endcapture %}
+      <div class="reading-layout">
+        <aside class="article-toc" aria-label="文章目录">
+          <div class="toc-sticky">
+            <a class="back-link" href="{{ '/blog/' | relative_url }}">← 全部文章</a>
+            <p class="toc-label">目录</p>
+            <nav class="toc-nav">{{ article_toc }}</nav>
+          </div>
+        </aside>
+        <main id="main-content" class="article-main">
+          <header class="article-header">
+            <p class="eyebrow">
+              相对更新系列 <span class="series-number">blog{{ page.series_order }}</span>
+            </p>
+            <h1>{{ page.title }}</h1>
+            <p class="article-description">{{ page.description }}</p>
+            <div class="article-meta">
+              <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y.%m.%d' }}</time>
+              <span aria-hidden="true">·</span><span>{{ page.reading_minutes }} 分钟阅读</span> <span aria-hidden="true">·</span
+              ><span>
+                {{- site.first_name }}
+                {{ site.last_name -}}
+              </span>
+            </div>
+          </header>
+          <details class="mobile-toc">
+            <summary>文章目录</summary>
+            <nav class="toc-nav" aria-label="文章目录">{{ article_toc }}</nav>
+          </details>
+          <article id="article-content" class="prose">{{ content }}</article>
+          <nav class="series-next" aria-label="系列文章">
+            {% assign series_posts = site.posts | where: 'series', 'relative-updates' | sort: 'series_order' %}
+            {% for post in series_posts %}
+              {% unless post.url == page.url %}
+                <p class="eyebrow">
+                  {% if post.series_order > page.series_order -%}
+                    继续阅读 · blog{{ post.series_order -}}
+                  {%- else -%}
+                    回到前篇 · blog{{ post.series_order -}}
+                  {%- endif %}
+                </p>
+                <a href="{{ post.url | relative_url }}">
+                  {{- post.title }}
+                  <span aria-hidden="true">→</span></a
+                >
+              {% endunless %}
+            {% endfor %}
+          </nav>
+        </main>
+      </div>
+    {% endif %}
+    <footer class="site-footer">
+      <span
+        >© {{ site.time | date: '%Y' }}
+        {{ site.first_name }}
+        {{ site.last_name -}}</span
+      ><a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+    </footer>
+  </body>
+</html>

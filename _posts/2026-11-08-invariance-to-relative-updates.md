@@ -1,5 +1,5 @@
 ---
-layout: "post"
+layout: "research"
 title: "从缩放不变性要求推导优化器"
 date: "2026-11-08 12:00:00 +0800"
 description: "从参数缩放协变性与损失缩放不变性出发，构造相对更新，并理解 ELR 与学习率系数的关系。"
@@ -7,20 +7,14 @@ lang: "zh-CN"
 permalink: "/blog/2026/invariance-to-relative-updates/"
 tags: ["optimization", "elr"]
 categories: ["research-notes"]
-featured: true
 related_posts: false
 giscus_comments: false
 disqus_comments: false
-comment_key: "blog1"
-toc: {"beginning": true}
-_styles: ".blog-series { margin: 1.25rem 0 2rem; padding: 1rem 1.25rem; border: 1px solid var(--global-divider-color, #d8dde3); border-radius: .65rem; font-size: .95rem; }\n.blog-series a { margin-right: 1rem; }\n.blog-feedback { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--global-divider-color, #d8dde3); }\n.blog-feedback form { display: grid; gap: 1rem; margin-top: 1.5rem; }\n.blog-feedback label { display: grid; gap: .4rem; }\n.blog-feedback input, .blog-feedback textarea { width: 100%; border: 1px solid var(--global-divider-color, #a9b1bb); border-radius: .4rem; padding: .65rem .8rem; color: inherit; background: var(--global-bg-color, #fff); font: inherit; }\n.blog-feedback textarea { min-height: 10rem; resize: vertical; }\n.blog-feedback .consent { display: flex; align-items: flex-start; gap: .6rem; }\n.blog-feedback .consent input { width: 1.1rem; height: 1.1rem; flex-shrink: 0; margin-top: .2rem; }\n.blog-feedback button { justify-self: start; border: 1px solid var(--global-theme-color, #6653a6); border-radius: .4rem; padding: .65rem 1.2rem; background: var(--global-theme-color, #6653a6); color: #fff; font: inherit; cursor: pointer; }\n.blog-feedback input:focus-visible, .blog-feedback textarea:focus-visible, .blog-feedback button:focus-visible { outline: 2px solid var(--global-theme-color, #6653a6); outline-offset: 3px; }\n.blog-feedback .feedback-note { font-size: .9rem; color: var(--global-text-color-light, #697386); }\n.blog-selected-comment { margin: 1.25rem 0; padding: 1rem 1.25rem; border: 1px solid var(--global-divider-color, #d8dde3); border-radius: .5rem; }\n.blog-selected-comment .author-reply { margin-top: 1rem; padding-left: 1rem; border-left: 3px solid var(--global-theme-color, #6653a6); }\n.post-content img[src*=\"/blog/relative-updates/\"] { max-width: 100%; height: auto; background: #fff; border-radius: .4rem; }"
+toc: true
+series: "relative-updates"
+series_order: 1
+reading_minutes: 9
 ---
-
-<nav class="blog-series" aria-label="相对更新系列">
-  <strong>相对更新系列</strong><br>
-  <a href="{{ '/blog/2026/invariance-to-relative-updates/' | relative_url }}">blog1 · 从缩放不变性要求推导优化器</a>
-  <a href="{{ '/blog/2026/relative-updates-and-hypersphere/' | relative_url }}">blog2 · 相对更新之后：超球面约束额外改变了什么？</a>
-</nav>
 
 <!-- article-source:start -->
 同一个函数可以有两种参数化写法：一种直接用参数 *w*，另一种存 *ŵ = cw*，并在前向中除回 *c*。只要参数对应，它们就 functionally equivalent：
@@ -95,7 +89,8 @@ $$
 ## 让更新保持对应：参数缩放协变性
 
 不管用什么优化器，一步更新都可以写成 *w ← w−φ*，其中 *φ* 是实际更新量。不考虑权重衰减时，常见优化器可写成 *φ=ηu*，比如 SGD 的 *u* 是梯度 *g*，Adam 的 *u* 是 *m/√v*。
-要让轨迹一致，φ 该满足什么？我们从一步更新来看。新写法在前向时用的是 ŵ/c，所以两种写法要表示同一个函数，每一步都必须满足 ŵt = c wt。第0步时默认成立，假设第 t 步这个关系成立，两种写法的更新分别是：
+
+要让轨迹一致，φ 该满足什么？我们从一步更新来看。新写法在前向时用的是 ŵ/c，所以两种写法要表示同一个函数，每一步都必须满足 ŵt = c wt。第 0 步时默认成立，假设第 t 步这个关系成立，两种写法的更新分别是：
 
 $$
 w_{t+1}=w_t-\phi,\qquad \hat w_{t+1}=\hat w_t-\hat\phi.
@@ -293,6 +288,7 @@ $$
 *p=0* 是**刚才这个幂函数族中**同时满足两个缩放要求的唯一非零选择，但不是所有优化器中的唯一解。
 
 损失缩放不变性针对的是整个损失的统一倍数，但不是所有类型的缩放都应该保持不变性。
+
 （例如 *ℓ=ℓ₁+λℓ₂* 中，只改变 *λ* 会改变两个目标的相对重要性，优化器可以忽略整个损失的计分倍数，但不应因此忽略不同训练目标之间的权重变化。）
 
 从两个要求本身看，利用损失缩放不变性，可以在参数缩放协变性的条件中消去梯度的 *1/c*：
@@ -334,6 +330,7 @@ $$
 $$
 
 涉及历史状态时，也要把状态的变换一起算进去。
+
 方向满足这个关系，就有：
 
 $$
@@ -365,6 +362,7 @@ $$
 $$
 
 因此，用 SGD 方向构造的规则同时满足参数缩放协变性和损失缩放不变性。
+
 换用其他优化器时，分别检查 *ℓ→ℓ̂* 和 *ℓ→ℓ̄=kℓ*：前者要求 *û/‖û‖=u/‖u‖*，后者要求 *u_k/‖u_k‖=u/‖u‖*。归一化可以消去 *u* 的正数倍长度变化。
 
 ## 用 ELR 看清：η 究竟控制什么？
@@ -468,6 +466,7 @@ $$
 | 映回原参数表示 | 2.7 | 27/10＝2.7 | 3.6 | 7.2/2＝3.6 |
 
 A 块换成十倍大的参数，更新也自然变成十倍；B 块换成两倍大的参数，更新也自然变成两倍。更新规则只使用各块当前的参数长度和梯度方向，不需要额外接收 10 和 2，也不需要分别调整学习率。
+
 前面已经证明，参数与梯度变成 *cw、g/c* 时，这条规则给出的更新也变成原来的 *c* 倍。因此，分别用于 A、B 后，就有：
 
 $$
@@ -482,57 +481,6 @@ $$
 从“同一个模型换一种参数表示，训练能否保持对应”这个问题出发，我们提出参数缩放协变性，再加入损失缩放不变性。从 SGD 出发，在选定的幂函数族中，这两个要求共同选出了相对更新规则。随后计算 ELR，我们从另一个角度理解了更新后规则中学习率系数的含义：控制每步更新长度占当前权重长度的比例。
 
 至此，我们回答了参数表示改变时，怎样让训练保持对应。接下来我们想看：这样的相对更新，对实际训练意味着什么？为什么一些方法还会关注权重方向的变化，甚至进一步固定权重模长？
+
 本文的两个缩放要求与协变性思路参考苏剑林的《从参数对称性到有效学习率》。
 <!-- article-source:end -->
-
-<nav class="blog-series" aria-label="相对更新系列">
-  <strong>相对更新系列</strong><br>
-  <a href="{{ '/blog/2026/invariance-to-relative-updates/' | relative_url }}">blog1 · 从缩放不变性要求推导优化器</a>
-  <a href="{{ '/blog/2026/relative-updates-and-hypersphere/' | relative_url }}">blog2 · 相对更新之后：超球面约束额外改变了什么？</a>
-</nav>
-
-
-<section class="blog-feedback" aria-labelledby="feedback-title">
-  <h2 id="feedback-title">留言与精选讨论</h2>
-  <p>留言通过 <a href="https://formsubmit.co/" rel="noopener noreferrer" target="_blank">FormSubmit</a> 发到我的邮箱，不会自动公开。只有经你同意并由我精选的留言及回复，才会展示在这里；邮箱不会公开。</p>
-  {% assign selected_comments = site.data.blog_comments[page.comment_key] %}
-  {% if selected_comments.size > 0 %}
-    <h3>精选讨论</h3>
-    {% for comment in selected_comments %}
-      <div class="blog-selected-comment">
-        <p><strong>{{ comment.author | escape }}</strong>{% if comment.date %} · <time>{{ comment.date | escape }}</time>{% endif %}</p>
-        <p>{{ comment.message | escape | newline_to_br }}</p>
-        {% if comment.reply and comment.reply != '' %}
-          <div class="author-reply">
-            <p><strong>{{ site.first_name | escape }} {{ site.last_name | escape }} 回复</strong>{% if comment.reply_date %} · <time>{{ comment.reply_date | escape }}</time>{% endif %}</p>
-            <p>{{ comment.reply | escape | newline_to_br }}</p>
-          </div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  {% else %}
-    <p class="feedback-note">暂时还没有公开的精选留言。</p>
-  {% endif %}
-  <form action="https://formsubmit.co/{{ site.data.socials.email | escape }}" method="POST" accept-charset="UTF-8">
-    <input type="hidden" name="_subject" value="[博客留言] {{ page.title | escape }}">
-    <input type="hidden" name="_next" value="{{ '/blog/message-received/' | absolute_url }}">
-    <input type="hidden" name="_template" value="table">
-    <input type="hidden" name="article" value="{{ page.title | escape }}">
-    <input type="hidden" name="article_url" value="{{ page.url | absolute_url }}">
-    <input type="text" name="_honey" style="display: none" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <label for="feedback-name">姓名或昵称
-      <input id="feedback-name" name="name" type="text" autocomplete="nickname" maxlength="80" required>
-    </label>
-    <label for="feedback-email">邮箱（可选，用于私下回复，不会公开）
-      <input id="feedback-email" name="email" type="email" autocomplete="email" maxlength="254">
-    </label>
-    <label for="feedback-message">留言
-      <textarea id="feedback-message" name="message" maxlength="10000" required></textarea>
-    </label>
-    <label class="consent" for="feedback-consent">
-      <input id="feedback-consent" name="permission_to_publish" type="checkbox" value="yes">
-      <span>我同意作者将这条留言与所用昵称精选公开。不勾选则仅作私下交流。</span>
-    </label>
-    <button type="submit">发送私密留言</button>
-  </form>
-</section>
